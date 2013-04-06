@@ -664,6 +664,9 @@ LEX
 BISON
 ENABLE_MAINTAINER_MODE_FALSE
 ENABLE_MAINTAINER_MODE_TRUE
+MAINT
+MAINTAINER_MODE_FALSE
+MAINTAINER_MODE_TRUE
 GCOV_LIBS
 GCOV_LDFLAGS
 GCOV_CFLAGS
@@ -1508,7 +1511,8 @@ Optional Features:
   --disable-largefile     omit support for large files
   --enable-gcov           enables gnu coverage (default: no)
   --enable-maintainer-mode
-                          enable maintainer mode (default: no)
+                          enable make rules and dependencies not useful (and
+                          sometimes confusing) to the casual installer
   --enable-readline       enable readline support (default: yes)
   --enable-static-readline
                           using static library 'readline' (default: no)
@@ -6717,16 +6721,31 @@ fi
 
 
 
-# Check whether --enable-maintainer-mode was given.
-if test "${enable_maintainer_mode+set}" = set; then :
-  enableval=$enable_maintainer_mode; tr_MAINTAINER_MODE="${enableval:-yes}"
-else
-  tr_MAINTAINER_MODE=no
 
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable maintainer-specific portions of Makefiles" >&5
+$as_echo_n "checking whether to enable maintainer-specific portions of Makefiles... " >&6; }
+    # Check whether --enable-maintainer-mode was given.
+if test "${enable_maintainer_mode+set}" = set; then :
+  enableval=$enable_maintainer_mode; USE_MAINTAINER_MODE=$enableval
+else
+  USE_MAINTAINER_MODE=no
 fi
 
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $USE_MAINTAINER_MODE" >&5
+$as_echo "$USE_MAINTAINER_MODE" >&6; }
+   if test $USE_MAINTAINER_MODE = yes; then
+  MAINTAINER_MODE_TRUE=
+  MAINTAINER_MODE_FALSE='#'
+else
+  MAINTAINER_MODE_TRUE='#'
+  MAINTAINER_MODE_FALSE=
+fi
 
-if test "x$tr_MAINTAINER_MODE" = "xyes";  then
+  MAINT=$MAINTAINER_MODE_TRUE
+
+
+
+if test "x$USE_MAINTAINER_MODE" = "xyes";  then
 
 cat >>confdefs.h <<_ACEOF
 #define TRI_ENABLE_MAINTAINER_MODE 1
@@ -6734,7 +6753,7 @@ _ACEOF
 
 fi
 
- if test "x$tr_MAINTAINER_MODE" = xyes; then
+ if test "x$USE_MAINTAINER_MODE" = xyes; then
   ENABLE_MAINTAINER_MODE_TRUE=
   ENABLE_MAINTAINER_MODE_FALSE='#'
 else
@@ -6744,7 +6763,7 @@ fi
 
 
 
-if test "x$tr_MAINTAINER_MODE" = xyes;  then
+if test "x$USE_MAINTAINER_MODE" = xyes;  then
   { $as_echo "$as_me:${as_lineno-$LINENO}: ................................................................................" >&5
 $as_echo "$as_me: ................................................................................" >&6;}
   { $as_echo "$as_me:${as_lineno-$LINENO}: CHECKING BISON" >&5
@@ -6822,7 +6841,7 @@ else
 fi
 
 
-if test "x$tr_MAINTAINER_MODE" = xyes;  then
+if test "x$USE_MAINTAINER_MODE" = xyes;  then
   { $as_echo "$as_me:${as_lineno-$LINENO}: ................................................................................" >&5
 $as_echo "$as_me: ................................................................................" >&6;}
   { $as_echo "$as_me:${as_lineno-$LINENO}: CHECKING FLEX" >&5
@@ -9108,6 +9127,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${ENABLE_GCOV_TRUE}" && test -z "${ENABLE_GCOV_FALSE}"; then
   as_fn_error $? "conditional \"ENABLE_GCOV\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${MAINTAINER_MODE_TRUE}" && test -z "${MAINTAINER_MODE_FALSE}"; then
+  as_fn_error $? "conditional \"MAINTAINER_MODE\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${ENABLE_MAINTAINER_MODE_TRUE}" && test -z "${ENABLE_MAINTAINER_MODE_FALSE}"; then
