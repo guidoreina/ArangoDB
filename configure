@@ -7796,7 +7796,7 @@ LIB_INFO="$LIB_INFO|."
 
 TRI_ZLIB_VERSION="1.2.7"
 
-ZLIB_CPPFLAGS"=-I${srcdir}/3rdParty/zlib-${TRI_ZLIB_VERSION}/contrib/minizip"
+ZLIB_CPPFLAGS="-I${srcdir}/3rdParty/zlib-${TRI_ZLIB_VERSION}/contrib/minizip"
 ZLIB_LDFLAGS=""
 ZLIB_LIBS="${srcdir}/3rdParty/zlib-${TRI_ZLIB_VERSION}/libz.a"
 
@@ -7905,7 +7905,7 @@ LDFLAGS="$LDFLAGS $LIBEV_LDFLAGS"
 SAVE_LIBS="$LIBS"
 
 
-ch_LIBEV="$tr_LIBEV"
+tr_LIBEV="yes"
 
 for ac_header in ev.h
 do :
@@ -7914,7 +7914,7 @@ if test "x$ac_cv_header_ev_h" = xyes; then :
   cat >>confdefs.h <<_ACEOF
 #define HAVE_EV_H 1
 _ACEOF
- tr_LIBEV="yes"
+
 else
   tr_LIBEV="no"
 fi
@@ -7922,8 +7922,7 @@ fi
 done
 
 
-if test "x$tr_LIBEV" = xyes;  then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for clock_gettime in -lrt" >&5
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for clock_gettime in -lrt" >&5
 $as_echo_n "checking for clock_gettime in -lrt... " >&6; }
 if ${ac_cv_lib_rt_clock_gettime+:} false; then :
   $as_echo_n "(cached) " >&6
@@ -7961,15 +7960,17 @@ fi
 $as_echo "$ac_cv_lib_rt_clock_gettime" >&6; }
 if test "x$ac_cv_lib_rt_clock_gettime" = xyes; then :
   LIBEV_LIBS="-lrt" LIBS="-lrt $LIBS"
+else
+  tr_LIBEV="no"
 fi
 
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for ev_now in -llibev" >&5
-$as_echo_n "checking for ev_now in -llibev... " >&6; }
-if ${ac_cv_lib_libev_ev_now+:} false; then :
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for ev_now in -lev" >&5
+$as_echo_n "checking for ev_now in -lev... " >&6; }
+if ${ac_cv_lib_ev_ev_now+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   ac_check_lib_save_LIBS=$LIBS
-LIBS="-llibev  $LIBS"
+LIBS="-lev  $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -7989,21 +7990,22 @@ return ev_now ();
 }
 _ACEOF
 if ac_fn_c_try_link "$LINENO"; then :
-  ac_cv_lib_libev_ev_now=yes
+  ac_cv_lib_ev_ev_now=yes
 else
-  ac_cv_lib_libev_ev_now=no
+  ac_cv_lib_ev_ev_now=no
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
 LIBS=$ac_check_lib_save_LIBS
 fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_libev_ev_now" >&5
-$as_echo "$ac_cv_lib_libev_ev_now" >&6; }
-if test "x$ac_cv_lib_libev_ev_now" = xyes; then :
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_ev_ev_now" >&5
+$as_echo "$ac_cv_lib_ev_ev_now" >&6; }
+if test "x$ac_cv_lib_ev_ev_now" = xyes; then :
   LIBEV_LIBS="-lev $LIBEV_LIBS" tr_LIBEV="yes"
+else
+  tr_LIBEV="no"
 fi
 
-fi
 
 if test "x$tr_LIBEV" != xyes;  then
   as_fn_error $? "Please install libev from http://software.schmorp.de/pkg/libev.html" "$LINENO" 5
