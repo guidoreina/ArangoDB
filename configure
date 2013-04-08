@@ -829,7 +829,6 @@ enable_dependency_tracking
 enable_error_on_warning
 enable_eff_cpp
 enable_isystem
-enable_static_programs
 enable_logger
 enable_timing
 enable_figures
@@ -840,17 +839,13 @@ enable_maintainer_mode
 enable_readline
 with_readline
 with_readline_lib
-enable_static_readline
 with_openssl_inc
 with_openssl_lib
-enable_static_ssl
 with_libev
 with_libev_lib
-enable_static_libev
 enable_mruby
 with_v8
 with_v8_lib
-enable_static_v8
 with_icu_config
 '
       ac_precious_vars='build_alias
@@ -1502,8 +1497,6 @@ Optional Features:
   --enable-eff-cpp        use -Weffc++ (default: no)
   --enable-isystem        enables the use of -isystem instead of -I for system
                           headers (default: no)
-  --enable-static-programs
-                          do not use shared libraries (default: no)
   --enable-logger         enable logging and timing (default: yes)
   --enable-timing         enable timing (default: yes)
   --enable-figures        enable figures, use 'yes', 'no', or 'hires'(default:
@@ -1514,12 +1507,7 @@ Optional Features:
                           enable make rules and dependencies not useful (and
                           sometimes confusing) to the casual installer
   --enable-readline       enable readline support (default: yes)
-  --enable-static-readline
-                          using static library 'readline' (default: no)
-  --enable-static-ssl     using static library 'ssl' (default: no)
-  --enable-static-libev   using static library 'libev' (default: no)
-  --enable-mruby          enable MRUBY
-  --enable-static-v8      using static library 'v8' (default: no)
+  --enable-mruby          enable MRUBY (default: no)
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -5519,35 +5507,6 @@ if test "x$tr_ISYSTEM" = "xno";  then
 fi
 
 
-case $target in
-  *-apple-darwin*)
-    ABS_STATIC_LIBS="yes"
-    STATIC_LIBS=""
-    DYNAMIC_LIBS=""
-    LIBTOOL_LIBS=""
-    USE_DYLD="yes"
-    ;;
-
-  *)
-    STATIC_LIBS="-Wl,-Bstatic"
-    DYNAMIC_LIBS="-Wl,-Bdynamic"
-    LIBTOOL_LIBS="-Wl,"
-    ;;
-esac
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -5645,32 +5604,6 @@ else
   RANLIB="$ac_cv_prog_RANLIB"
 fi
 
-
-
-
-# Check whether --enable-static-programs was given.
-if test "${enable_static_programs+set}" = set; then :
-  enableval=$enable_static_programs; tr_STATIC_PROGRAMS="$enableval"
-else
-  tr_STATIC_PROGRAMS="no"
-
-fi
-
-
-
-if test "x$tr_STATIC_PROGRAMS" = xyes;  then
-  LDFLAGS="$LDFLAGS -static"
-fi
-
-
-
-
-
-if test "x$tr_STATIC_PROGRAMS" = xyes;  then
-  BASIC_INFO="$BASIC_INFO|STATIC PROGRAMS:  enabled"
-else
-  BASIC_INFO="$BASIC_INFO|STATIC PROGRAMS:  disabled"
-fi
 
 
 
@@ -7163,21 +7096,6 @@ fi
 
 
 
-  if test "x$STATIC_LIBS" != x -o "x$ABS_STATIC_LIBS" = xyes;  then
-    # Check whether --enable-static-readline was given.
-if test "${enable_static_readline+set}" = set; then :
-  enableval=$enable_static_readline; tr_static_readline="$enableval"
-else
-  tr_static_readline="no"
-
-fi
-
-  else
-    tr_static_readline="no"
-  fi
-
-
-
 if test "x$READLINE_CPPFLAGS" != x;  then
 
   if test "xREADLINE_CPPFLAGS" != "x";  then
@@ -7477,39 +7395,6 @@ done
 
 
   if test "x$tr_READLINE" = xyes;  then
-
-  if test "x$ABS_STATIC_LIBS" = xyes -a "x$tr_static_readline" = xyes;  then
-    tr_library_found=no
-
-    { $as_echo "$as_me:${as_lineno-$LINENO}: checking readline" >&5
-$as_echo_n "checking readline... " >&6; }
-
-  tr_library=""
-
-  for tr_path in $LDFLAGS;  do
-    case $tr_path in
-      -L*)
-        path=`echo $tr_path | sed -e 's:^-L::'`
-        if test -f "$path/libreadline.a";  then
-          tr_library="$path/libreadline.a"
-        fi
-        ;;
-    esac
-  done
-
-
-    if test "x$tr_library" != x;  then
-      READLINE_LIBS="$tr_library $READLINE_LIBS"
-      { $as_echo "$as_me:${as_lineno-$LINENO}: result: $tr_library" >&5
-$as_echo "$tr_library" >&6; }
-      tr_library_found=yes
-    else
-      { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-    fi
-  else
-    tr_library_found=yes
-
     { $as_echo "$as_me:${as_lineno-$LINENO}: checking for readline in -lreadline" >&5
 $as_echo_n "checking for readline in -lreadline... " >&6; }
 if ${ac_cv_lib_readline_readline+:} false; then :
@@ -7547,42 +7432,14 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_readline_readline" >&5
 $as_echo "$ac_cv_lib_readline_readline" >&6; }
 if test "x$ac_cv_lib_readline_readline" = xyes; then :
-  READLINE_LIBS="-lreadline $READLINE_LIBS"
+  READLINE_LIBS="-lreadline" tr_READLINE="yes"
 else
-  tr_library_found=no
+  tr_READLINE="no"
 fi
 
   fi
 
-    tr_READLINE=$tr_library_found
-  fi
-
-  if test "x$tr_READLINE" = xyes;  then
-
-  if test "x$tr_static_readline" = xyes -a "xREADLINE_LIBS" != x;  then
-    tr_libs=""
-    tr_special=""
-
-    for tr_lib in $READLINE_LIBS;  do
-       case $tr_lib in
-         -lpthread|-lm|-lrt)
-           tr_special="$tr_special $tr_lib"
-           ;;
-
-	 -l*)
-	   tr_libs="$tr_libs $tr_lib"
-           ;;
-
-         *)
-	   tr_libs="$tr_libs $tr_lib"
-           ;;
-       esac
-    done
-
-    READLINE_LIBS="$STATIC_LIBS $tr_libs $DYNAMIC_LIBS $tr_special"
-  fi
-
-  else
+  if test "x$tr_READLINE" != xyes;  then
     if test "x$ch_READLINE" = xyes;  then
       as_fn_error $? "Please install readline support" "$LINENO" 5
     fi
@@ -7681,21 +7538,6 @@ if test "${with_openssl_lib+set}" = set; then :
   withval=$with_openssl_lib; OPENSSL_LDFLAGS="-L$withval"
 
 fi
-
-
-
-  if test "x$STATIC_LIBS" != x -o "x$ABS_STATIC_LIBS" = xyes;  then
-    # Check whether --enable-static-ssl was given.
-if test "${enable_static_ssl+set}" = set; then :
-  enableval=$enable_static_ssl; tr_static_ssl="$enableval"
-else
-  tr_static_ssl="no"
-
-fi
-
-  else
-    tr_static_ssl="no"
-  fi
 
 
 
@@ -7898,202 +7740,12 @@ else
 $as_echo "SSL_METHOD*" >&6; }
 fi
 
-if test "x$tr_STATIC_PROGRAMS" = xyes;  then
-  LDFLAGS="$LDFLAGS $lt_prog_compiler_static"
-
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking if OpenSSL requires static zlib" >&5
-$as_echo_n "checking if OpenSSL requires static zlib... " >&6; }
-
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-#include <openssl/ssl.h>
-
-int
-main ()
-{
-
-    SSL_library_init();
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"; then :
-  tr_OPENSSL_NEEDS_ZLIB=no
-else
-  tr_OPENSSL_NEEDS_ZLIB=yes
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $tr_OPENSSL_NEEDS_ZLIB" >&5
-$as_echo "$tr_OPENSSL_NEEDS_ZLIB" >&6; }
-
-  if test "x$tr_OPENSSL_NEEDS_ZLIB" = "xyes";  then
-    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for zError in -lz" >&5
-$as_echo_n "checking for zError in -lz... " >&6; }
-if ${ac_cv_lib_z_zError+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lz  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char zError ();
-int
-main ()
-{
-return zError ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"; then :
-  ac_cv_lib_z_zError=yes
-else
-  ac_cv_lib_z_zError=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_z_zError" >&5
-$as_echo "$ac_cv_lib_z_zError" >&6; }
-if test "x$ac_cv_lib_z_zError" = xyes; then :
-  OPENSSL_LIBS="$OPENSSL_LIBS -lz"
-else
-  as_fn_error $? "please install the static zlib library" "$LINENO" 5
-fi
-
-  fi
-fi
-
-if test "x$tr_static_ssl" = xyes -a "x$ABS_STATIC_LIBS" = xyes;  then
-     tr_libraries_found=no
-     tr_missing=""
-     tr_result=""
-     tr_special=""
-
-     for tr_lib in $OPENSSL_LIBS;  do
-       case $tr_lib in
-         -lpthread|-lm|-lrt)
-           tr_special="$tr_special $tr_lib"
-           ;;
-
-	 -l*)
-	   lib=`echo $tr_lib | sed -e 's:^-l::'`
-	   tr_missing="$tr_missing $lib"
-	   ;;
-       esac
-     done
-
-     for tr_path in $OPENSSL_LIBS;  do
-       case $tr_path in
-	 -L*)
-	   path=`echo $tr_path | sed -e 's:^-L::'`
-
-	   tr_still_missing=""
-
-	   for tr_lib in $tr_missing;  do
-	     { $as_echo "$as_me:${as_lineno-$LINENO}: checking for the static library $tr_lib in $path" >&5
-$as_echo_n "checking for the static library $tr_lib in $path... " >&6; }
-
-	     if test -f "$path/lib$tr_lib.a";  then
-               { $as_echo "$as_me:${as_lineno-$LINENO}: result: $path/lib$tr_lib.a" >&5
-$as_echo "$path/lib$tr_lib.a" >&6; }
-	       tr_result="$tr_result $path/lib$tr_lib.a"
-	     else
-               { $as_echo "$as_me:${as_lineno-$LINENO}: result: " >&5
-$as_echo "" >&6; }
-	       tr_still_missing="$tr_sill_missing $tr_lib"
-	     fi
-	   done
-
-	   tr_missing="$tr_still_missing"
-	   ;;
-       esac
-     done
-
-     for tr_path in $LDFLAGS;  do
-       case $tr_path in
-	 -L*)
-	   path=`echo $tr_path | sed -e 's:^-L::'`
-
-	   tr_still_missing=""
-
-	   for tr_lib in $tr_missing;  do
-	     { $as_echo "$as_me:${as_lineno-$LINENO}: checking for the static library $tr_lib in $path" >&5
-$as_echo_n "checking for the static library $tr_lib in $path... " >&6; }
-
-	     if test -f "$path/lib$tr_lib.a";  then
-               { $as_echo "$as_me:${as_lineno-$LINENO}: result: $path/lib$tr_lib.a" >&5
-$as_echo "$path/lib$tr_lib.a" >&6; }
-	       tr_result="$tr_result $path/lib$tr_lib.a"
-	     else
-               { $as_echo "$as_me:${as_lineno-$LINENO}: result: " >&5
-$as_echo "" >&6; }
-	       tr_still_missing="$tr_sill_missing $tr_lib"
-	     fi
-	   done
-
-	   tr_missing="$tr_still_missing"
-	   ;;
-       esac
-     done
-
-     if test "x$tr_missing" = x;  then
-       tr_libraries_found=yes
-       OPENSSL_LIBS="$tr_result $tr_special"
-     else
-       tr_libraries_found=no
-     fi
-   else
-     tr_libraries_found=yes
-   fi
-
-
-if test "x$tr_libraries_found" != xyes;  then
-  as_fn_error $? "Please install the OpenSSL library" "$LINENO" 5
-fi
-
 
 
   if test "xOPENSSL_CPPFLAGS" != "x";  then
     if test "x$INCPREFIX" != "x-I";  then
       OPENSSL_CPPFLAGS=`echo $OPENSSL_CPPFLAGS | sed -e "s:-I:$INCPREFIX:g"`
     fi
-  fi
-
-
-  if test "x$tr_static_ssl" = xyes -a "xOPENSSL_LIBS" != x;  then
-    tr_libs=""
-    tr_special=""
-
-    for tr_lib in $OPENSSL_LIBS;  do
-       case $tr_lib in
-         -lpthread|-lm|-lrt)
-           tr_special="$tr_special $tr_lib"
-           ;;
-
-	 -l*)
-	   tr_libs="$tr_libs $tr_lib"
-           ;;
-
-         *)
-	   tr_libs="$tr_libs $tr_lib"
-           ;;
-       esac
-    done
-
-    OPENSSL_LIBS="$STATIC_LIBS $tr_libs $DYNAMIC_LIBS $tr_special"
   fi
 
 
@@ -8216,21 +7868,6 @@ if test "${with_libev_lib+set}" = set; then :
 fi
 
 
-
-  if test "x$STATIC_LIBS" != x -o "x$ABS_STATIC_LIBS" = xyes;  then
-    # Check whether --enable-static-libev was given.
-if test "${enable_static_libev+set}" = set; then :
-  enableval=$enable_static_libev; tr_static_libev="$enableval"
-else
-  tr_static_libev="no"
-
-fi
-
-  else
-    tr_static_libev="no"
-  fi
-
-
 { $as_echo "$as_me:${as_lineno-$LINENO}: --------------------------------------------------------------------------------" >&5
 $as_echo "$as_me: --------------------------------------------------------------------------------" >&6;}
 { $as_echo "$as_me:${as_lineno-$LINENO}: CHECKING FOR LIBEV" >&5
@@ -8323,50 +7960,16 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_rt_clock_gettime" >&5
 $as_echo "$ac_cv_lib_rt_clock_gettime" >&6; }
 if test "x$ac_cv_lib_rt_clock_gettime" = xyes; then :
-  LIBEV_LIBS="-lrt $LIBEV_LIBS" LIBS="-lrt $LIBS"
+  LIBEV_LIBS="-lrt" LIBS="-lrt $LIBS"
 fi
 
-
-
-  if test "x$ABS_STATIC_LIBS" = xyes -a "x$tr_static_libev" = xyes;  then
-    tr_library_found=no
-
-    { $as_echo "$as_me:${as_lineno-$LINENO}: checking ev" >&5
-$as_echo_n "checking ev... " >&6; }
-
-  tr_library=""
-
-  for tr_path in $LDFLAGS;  do
-    case $tr_path in
-      -L*)
-        path=`echo $tr_path | sed -e 's:^-L::'`
-        if test -f "$path/libev.a";  then
-          tr_library="$path/libev.a"
-        fi
-        ;;
-    esac
-  done
-
-
-    if test "x$tr_library" != x;  then
-      LIBEV_LIBS="$tr_library $LIBEV_LIBS"
-      { $as_echo "$as_me:${as_lineno-$LINENO}: result: $tr_library" >&5
-$as_echo "$tr_library" >&6; }
-      tr_library_found=yes
-    else
-      { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-    fi
-  else
-    tr_library_found=yes
-
-    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for ev_now in -lev" >&5
-$as_echo_n "checking for ev_now in -lev... " >&6; }
-if ${ac_cv_lib_ev_ev_now+:} false; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for ev_now in -llibev" >&5
+$as_echo_n "checking for ev_now in -llibev... " >&6; }
+if ${ac_cv_lib_libev_ev_now+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   ac_check_lib_save_LIBS=$LIBS
-LIBS="-lev  $LIBS"
+LIBS="-llibev  $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -8386,53 +7989,23 @@ return ev_now ();
 }
 _ACEOF
 if ac_fn_c_try_link "$LINENO"; then :
-  ac_cv_lib_ev_ev_now=yes
+  ac_cv_lib_libev_ev_now=yes
 else
-  ac_cv_lib_ev_ev_now=no
+  ac_cv_lib_libev_ev_now=no
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
 LIBS=$ac_check_lib_save_LIBS
 fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_ev_ev_now" >&5
-$as_echo "$ac_cv_lib_ev_ev_now" >&6; }
-if test "x$ac_cv_lib_ev_ev_now" = xyes; then :
-  LIBEV_LIBS="-lev $LIBEV_LIBS"
-else
-  tr_library_found=no
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_libev_ev_now" >&5
+$as_echo "$ac_cv_lib_libev_ev_now" >&6; }
+if test "x$ac_cv_lib_libev_ev_now" = xyes; then :
+  LIBEV_LIBS="-lev $LIBEV_LIBS" tr_LIBEV="yes"
 fi
 
-  fi
-
-  tr_LIBEV=$tr_library_found
 fi
 
-if test "x$tr_LIBEV" = xyes;  then
-
-  if test "x$tr_static_libev" = xyes -a "xLIBEV_LIBS" != x;  then
-    tr_libs=""
-    tr_special=""
-
-    for tr_lib in $LIBEV_LIBS;  do
-       case $tr_lib in
-         -lpthread|-lm|-lrt)
-           tr_special="$tr_special $tr_lib"
-           ;;
-
-	 -l*)
-	   tr_libs="$tr_libs $tr_lib"
-           ;;
-
-         *)
-	   tr_libs="$tr_libs $tr_lib"
-           ;;
-       esac
-    done
-
-    LIBEV_LIBS="$STATIC_LIBS $tr_libs $DYNAMIC_LIBS $tr_special"
-  fi
-
-else
+if test "x$tr_LIBEV" != xyes;  then
   as_fn_error $? "Please install libev from http://software.schmorp.de/pkg/libev.html" "$LINENO" 5
 fi
 
@@ -8621,21 +8194,6 @@ if test "${with_v8_lib+set}" = set; then :
    V8_LIB_PATH="$withval"
 
 fi
-
-
-
-  if test "x$STATIC_LIBS" != x -o "x$ABS_STATIC_LIBS" = xyes;  then
-    # Check whether --enable-static-v8 was given.
-if test "${enable_static_v8+set}" = set; then :
-  enableval=$enable_static_v8; tr_static_v8="$enableval"
-else
-  tr_static_v8="no"
-
-fi
-
-  else
-    tr_static_v8="no"
-  fi
 
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: --------------------------------------------------------------------------------" >&5
@@ -8860,7 +8418,6 @@ if test "${with_icu_config+set}" = set; then :
   withval=$with_icu_config; ICU_CONFIG="$withval"
 
 fi
-
 
 
 if test "x$tr_ICU" = xyes;  then
