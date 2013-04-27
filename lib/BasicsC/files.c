@@ -983,6 +983,10 @@ int TRI_VerifyLockFile (char const* filename) {
     // database is locked.
     return TRI_ERROR_NO_ERROR;
   }
+
+  // not really necessary, but this shuts up valgrind
+  memset(buffer, 0, sizeof(buffer));
+
   n = TRI_READ(fd, buffer, sizeof(buffer));
   TRI_CLOSE(fd);
 
@@ -990,9 +994,6 @@ int TRI_VerifyLockFile (char const* filename) {
   if (n == 0) {
     return TRI_set_errno(TRI_ERROR_ILLEGAL_NUMBER);
   }
-
-  // not really necessary, but this shuts up valgrind
-  memset(buffer, 0, sizeof(buffer));
 
   fc = TRI_UInt32String(buffer);
   res = TRI_errno();
@@ -1059,6 +1060,9 @@ int TRI_VerifyLockFile (char const* filename) {
     return TRI_set_errno(TRI_ERROR_SYS_ERROR);
   }
 
+  // not really necessary, but this shuts up valgrind
+  memset(buffer, 0, sizeof(buffer));
+
   fd = TRI_OPEN(filename, O_RDONLY);
   n = TRI_READ(fd, buffer, sizeof(buffer));
   TRI_CLOSE(fd);
@@ -1067,9 +1071,6 @@ int TRI_VerifyLockFile (char const* filename) {
   if (n == 0) {
     return TRI_set_errno(TRI_ERROR_ILLEGAL_NUMBER);
   }
-
-  // not really necessary, but this shuts up valgrind
-  memset(buffer, 0, sizeof(buffer));
 
   fc = TRI_UInt32String(buffer);
   res = TRI_errno();
