@@ -165,7 +165,7 @@ static volatile double StatisticsTime;
 ////////////////////////////////////////////////////////////////////////////////
 
 // -----------------------------------------------------------------------------
-// --SECTION--                               private request statistics ariables
+// --SECTION--                              private request statistics variables
 // -----------------------------------------------------------------------------
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -259,7 +259,7 @@ void TRI_ReleaseRequestStatistics (TRI_request_statistics_t* statistics) {
 ////////////////////////////////////////////////////////////////////////////////
 
 // -----------------------------------------------------------------------------
-// --SECTION--                            private connection statistics ariables
+// --SECTION--                           private connection statistics variables
 // -----------------------------------------------------------------------------
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -294,7 +294,7 @@ static TRI_statistics_list_t ConnectionDirtyList;
 ////////////////////////////////////////////////////////////////////////////////
 
 // -----------------------------------------------------------------------------
-// --SECTION--                               public connection statistics functions
+// --SECTION--                            public connection statistics functions
 // -----------------------------------------------------------------------------
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -756,6 +756,21 @@ void TRI_FillStatisticsList (TRI_statistics_list_t* list, size_t element, size_t
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// @brief destroys a linked list
+////////////////////////////////////////////////////////////////////////////////
+
+void TRI_DestroyStatisticsList (TRI_statistics_list_t* list) {
+  TRI_statistics_entry_t* entry = list->_first;
+  while (entry != NULL) {
+    TRI_statistics_entry_t* next = entry->_next;
+    TRI_Free(TRI_CORE_MEM_ZONE, entry);
+    entry = next;
+  }
+
+  list->_first = list->_last = NULL;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 /// @brief disable the statistics gathering
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -801,8 +816,29 @@ void TRI_InitialiseStatistics () {
   TRI_InitSpin(&StatisticsTimeLock);
 
   TRI_InitThread(&StatisticsThread);
-  TRI_StartThread(&StatisticsThread, "[statistics]", StatisticsLoop, 0);
 
+  if (StatisticsRunning) {
+    TRI_StartThread(&StatisticsThread, "[statistics]", StatisticsLoop, 0);
+  }
+
+#endif
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief shut down statistics
+////////////////////////////////////////////////////////////////////////////////
+
+void TRI_ShutdownStatistics (void) {
+#if TRI_ENABLE_FIGURES
+  if (StatisticsRunning) {
+    TRI_DisableStatistics();
+    TRI_JoinThread(&StatisticsThread);
+  }
+
+  TRI_DestroyStatisticsList(&RequestFreeList);
+  TRI_DestroyStatisticsList(&RequestDirtyList);
+  TRI_DestroyStatisticsList(&ConnectionFreeList);
+  TRI_DestroyStatisticsList(&ConnectionDirtyList);
 #endif
 }
 

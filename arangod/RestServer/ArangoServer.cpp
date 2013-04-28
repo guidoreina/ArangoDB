@@ -183,6 +183,10 @@ ArangoServer::ArangoServer (int argc, char** argv)
     _applicationDispatcher(0),
     _applicationEndpointServer(0),
     _applicationAdminServer(0),
+#ifdef TRI_ENABLE_MRUBY
+    _applicationMR(0),
+#endif
+    _applicationV8(0),
     _dispatcherThreads(8),
     _databasePath(),
     _removeOnDrop(true),
@@ -205,6 +209,14 @@ ArangoServer::ArangoServer (int argc, char** argv)
 
   _defaultLanguage = Utf8Helper::DefaultUtf8Helper.getCollatorLanguage();
 
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief destructor
+////////////////////////////////////////////////////////////////////////////////
+
+ArangoServer::~ArangoServer () {
+  TRI_ShutdownStatistics();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
