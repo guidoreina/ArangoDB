@@ -187,6 +187,7 @@ bool TRI_StartThread (TRI_thread_t* thread,
     TRI_set_errno(TRI_ERROR_SYS_ERROR);
     LOG_ERROR("could not start thread: %s ", strerror(errno));
 
+    TRI_FreeString(TRI_CORE_MEM_ZONE, d->_name);
     TRI_Free(TRI_CORE_MEM_ZONE, d);
     return false;
   }
